@@ -50,17 +50,35 @@ def save_credentials():
                 with open("data.json", mode='r') as datafile:
                     data = json.load(datafile)
             except FileNotFoundError as error:
-                print(f"{error} was not found so new file is created")
                 with open("data.json", mode="w") as datafile:
                     json.dump(new_data, datafile, indent=4)
             else:
-                print("File Exists")
                 data.update(new_data)
                 with open("data.json", mode="w") as datafile:
                     json.dump(data, datafile, indent=4)
             finally:
                 website_input.delete(0, END)
                 password_input.delete(0, END)
+
+
+# ---------------------------- Search Credentials ------------------------------- #
+
+def search():
+    website = website_input.get()
+    if len(website) < 1:
+        messagebox.showerror(title="Error", message="Please enter the website name first.")
+    else:
+        try:
+            with open("data.json", mode="r") as datafile:
+                data = json.load(datafile)
+        except FileNotFoundError:
+            messagebox.showerror("No Data has been saved till now.")
+        else:
+            if website in data:
+                messagebox.showinfo(title=f"{website}", message=f"Email: {data[website]['email']}\n"
+                                                                f"Password: {data[website]['password']}")
+            else:
+                messagebox.showerror(title="Not Found", message=f"No Credentials found related to {website}")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -97,5 +115,7 @@ generate_button = Button(text="Generate Password", command=generate_password)
 generate_button.grid(column=2, row=3)
 add_button = Button(text="Add", width=44, command=save_credentials)
 add_button.grid(column=1, row=4, columnspan=2)
+search_button = Button(text="Search", command=search, width=15)
+search_button.grid(column=2, row=1)
 
 window.mainloop()
